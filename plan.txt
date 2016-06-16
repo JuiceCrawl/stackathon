@@ -1,0 +1,37 @@
+Hey David - would love to get an update from you!
+
+https://updateme.com/july16?from=david.g.yang@gmail.com
+
+
+- havea list of names, emails in json file
+
+[
+{name: "David", email: "david@david.com"},
+{}]
+
+
+nodemailer each email
+
+Hey {{firstname}} - would love to get an update from you!
+
+https://updateme.com/july16?from={{email}}
+
+
+---
+
+express server that serves this page
+
+store responses into a database table
+
+email
+update_time
+update_text
+
+
+----
+
+have a secret url updateme.com/july16/send_out_all_responses
+
+// user -< groups -< runs -< responses
+    //router.get('/:run_id/:period_id')
+
