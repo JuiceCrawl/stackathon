@@ -20,7 +20,18 @@ name in the environment files.
 var chalk = require('chalk');
 var db = require('./server/db');
 var User = db.model('user');
+var Cohort = db.model('cohort');
 var Promise = require('sequelize').Promise;
+
+var seedCohort = function(){
+    var cohort = [
+        {name: '1604GHA'}, 
+        {name: '1604FA'}];
+
+    var creatingCohorts = cohort.map(cohort => Cohort.create(cohort));
+
+    return Promise.all(creatingCohorts);
+}
 
 var seedUsers = function () {
 
@@ -29,13 +40,13 @@ var seedUsers = function () {
             name: 'Anna',
             email: 'annaegarcia@gmail.com',
             password: '123',
-            isAdmin: true
+            isAdmin: true,
         },
         {
             name: 'Obama',
             email: 'obama@gmail.com',
             password: 'potus',
-            isAdmin: false
+            isAdmin: false,
         }
     ];
 
@@ -48,9 +59,8 @@ var seedUsers = function () {
 };
 
 db.sync({ force: true })
-    .then(function () {
-        return seedUsers();
-    })
+    .then(() => seedUsers())
+    .then(() => seedCohort())
     .then(function () {
         console.log(chalk.green('Seed successful!'));
         process.kill(0);
