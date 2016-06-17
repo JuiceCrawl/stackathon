@@ -1,4 +1,4 @@
-app.directive('textBox', function (RandomGreetings) {
+app.directive('textBox', function () {
 
     return {
         restrict: 'E',

@@ -247,6 +247,19 @@ router.get('/messages/:id', function(req, res, next){
   });
 });
 
+router.get('/cohort/:id', function(req,res, next){
+  Classmates.findAll({
+    where: {
+      cohortId : req.params.id
+    }
+  })
+  .then(function(classmates){
+    var classList = classmates.map(e => e.dataValues);
+    console.log(classList)
+    res.status(200).send(classList);
+  })
+});
+
 // Find all messages from a particular newsletter so that we can join them in 1 message
 
 
