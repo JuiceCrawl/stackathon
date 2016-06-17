@@ -1,5 +1,6 @@
 'use strict';
 var path = require('path');
+var http = require('http');
 var router = require('express').Router();
 var db = require('../../db');
 var Classmates = db.model('user');
@@ -7,7 +8,48 @@ var Messages = db.model('message');
 var Newsletter = db.model('newsletter');
 var Cohort = db.model('cohort');
 var Bluebird = require('bluebird');
+var cron = require('node-cron');
 var IPAddress = '192.168.1.111';
+
+var task = cron.schedule('* * * * *', function() {
+  console.log('will execute every minute until stopped');
+  Newsletter.findAll({
+    where :{
+      status : 'Pending',
+      runDate : {
+        $lt : new Date()
+      }
+    }
+  })
+  .then(function(newsletters){
+    var unProcessedIds = newsletters.map(n => n.dataValues.id);
+    console.log(newsletters)
+    if(unProcessedIds.length > 0){ //if we have newsletters, process them
+      unProcessedIds.forEach(function(id){
+        //call /messages/ + id
+        var options = {
+          host: IPAddress,
+          port: 1337,
+          path: '/api/messages/' + id,
+          method: 'GET'
+        };
+
+        http.request(options, function(res) {
+          console.log('STATUS: ' + res.statusCode);
+          console.log('HEADERS: ' + JSON.stringify(res.headers));
+          res.setEncoding('utf8');
+          res.on('data', function (chunk) {
+            console.log('BODY: ' + chunk);
+          });
+        }).end();
+      });
+    }else{
+      console.log('no newsletters need processing!');
+      return;
+    }    
+  });
+});
+task.start();
 
 module.exports = router;
 
@@ -45,11 +87,12 @@ router.post('/send',function(req, res, next){
     //console.log('FOUND COHORT', cohort)
     return Newsletter.create({  
         sendDate: Date.now(),
-        cohortId : cohortId
+        cohortId : cohortId,
+        status: 'Pending'
     })
   })
   .then(function(news){
-    newsletterId = news.dataValues.id
+    newsletterId = news.dataValues.id;
     return Classmates.findAll({
       where : {
         cohortId : cohortId
@@ -117,13 +160,14 @@ router.post('/store', function(req, res, next){
   })
   .then(function(whatHappened){
     //console.log('HAPPENED',whatHappened);
+    req.session.userId = '';
     res.sendStatus(201);
   })
   .catch(next);  
   
 });
 
-// get and join most recent messages by nesletterId
+// get and join most recent messages by newsletterId
 router.get('/messages/:id', function(req, res, next){
   var cohortName, cohortId, finalTemplate; 
 
@@ -131,6 +175,11 @@ router.get('/messages/:id', function(req, res, next){
     where: {
       id : req.params.id
     }
+  })
+  .then(function(foundNews) {
+      return foundNews.update({
+        status: "Completed"
+      })
   })
   .then(function(news){
     cohortId = news.dataValues.cohortId;
@@ -179,14 +228,7 @@ router.get('/messages/:id', function(req, res, next){
 
   })
   .then(function(classmates){
-    var classEmailList = classmates.map(e => e.dataValues.email)
-     //console.log('CLASSMATES',classEmailList)
-    // var mailOptions = {
-    //     from: cohortName,
-    //     to: obj.email,
-    //     subject: "Here's what your classmates have to say",
-    //     text: finalTemplate 
-    // };
+    var classEmailList = classmates.map(e => e.dataValues.email);
 
     classEmailList.forEach(function(email){
       transporter.sendMail({
@@ -198,10 +240,10 @@ router.get('/messages/:id', function(req, res, next){
           if (error) {
               return console.log(error);
           }
-          console.log("Message Sent: ", info.response);
+          console.log("MESSAGE SENT: ", info.response);
       });
     });
-
+    res.sendStatus(201);
   });
 });
 
