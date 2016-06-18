@@ -18,13 +18,5 @@ module.exports = function (db) {
                 return new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
             }
         },
-        toSendDate: {
-            type: Sequelize.DATE,
-            defaultValue: function(){ //default is 1 month
-                return new Date(new Date().getTime() + (60 * 60 * 24 * 30 * 1000));
-            }
-        }
-    
-    });
-    
+    });  
 };

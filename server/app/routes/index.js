@@ -1,6 +1,8 @@
 'use strict';
 var path = require('path');
 var http = require('http');
+var request = require('request');
+var querystring = require('querystring')
 var chalk = require('chalk');
 var router = require('express').Router();
 var db = require('../../db');
@@ -11,47 +13,15 @@ var Cohort = db.model('cohort');
 var Bluebird = require('bluebird');
 var cron = require('node-cron');
 var IPAddress = '127.0.0.1';
+var utils = require('../utils/utils');
 // var io = require('../../io');
 
 // console.log('IO', io);
 
 var task = cron.schedule('* * * * *', function() {
-  console.log('will execute every minute until stopped');
-  Newsletter.findAll({
-    where :{
-      status : 'Pending',
-      runDate : {
-        $lt : new Date()
-      }
-    }
-  })
-  .then(function(newsletters){
-    var unProcessedIds = newsletters.map(n => n.dataValues.id);
-    console.log(newsletters)
-    if(unProcessedIds.length > 0){ //if we have newsletters, process them
-      unProcessedIds.forEach(function(id){
-        //call /messages/ + id
-        var options = {
-          host: IPAddress,
-          port: 1337,
-          path: '/api/messages/' + id,
-          method: 'GET'
-        };
-
-        http.request(options, function(res) {
-          console.log('STATUS: ' + res.statusCode);
-          console.log('HEADERS: ' + JSON.stringify(res.headers));
-          res.setEncoding('utf8');
-          res.on('data', function (chunk) {
-            console.log('BODY: ' + chunk);
-          });
-        }).end();
-      });
-    }else{
-      console.log(chalk.blue('No Newsletters need processing!'));
-      return;
-    }    
-  });
+  //console.log('will execute every minute until stopped');
+  utils.findOverdueNewsletters();
+  utils.findOverdueCohorts();
 });
 task.start();
 
@@ -69,26 +39,24 @@ var transporter = nodemailer.createTransport(smtpTransport({
 
 //find all cohort mates from DB and her emails
 router.post('/send',function(req, res, next){
-  //where cohort is from req.body.cohort
 
   //find cohort, create newsletter, set cohort, find classmate
   var newsletterId;
   var cohortId;
   var cohort;
-
   Cohort.findOne({
       where : {
         name : req.body.cohort,
       }
   })
   .then(function(cohort){
-    
+    // console.log(' 1 FOUND COHORT', cohort)
     cohort = cohort;
     cohortId = cohort.dataValues.id;
     return cohort;
   })
   .then(function(cohort){
-    //console.log('FOUND COHORT', cohort)
+    // console.log('2 FOUND COHORT', cohort)
     return Newsletter.create({  
         sendDate: Date.now(),
         cohortId : cohortId,
@@ -108,7 +76,7 @@ router.post('/send',function(req, res, next){
     //console.log('LOGGING', cohortMates.map(e => e.dataValues) )
     var peopleObj = cohortMates.map(e => e.dataValues)
     //console.log('NEWS',newsletterId)
-    peopleObj.forEach(person => sendAnEmail(person, newsletterId));
+    peopleObj.forEach(person => utils.sendAnEmail(person, newsletterId));
 
     res.sendStatus(201);
   })
@@ -138,7 +106,7 @@ router.get('/updateme/', function(req, res, next){
     console.log('SESSION',req.session) 
     res.sendFile(indexFile);
   }
-  console.log('SESSION',req.session) 
+  //console.log('SESSION',req.session) 
  
 });
 
@@ -260,7 +228,7 @@ router.get('/cohort/:id', function(req,res, next){
   })
   .then(function(classmates){
     var classList = classmates.map(e => e.dataValues);
-    console.log(classList)
+    //console.log(classList)
     res.status(200).send(classList);
   })
 });
@@ -290,22 +258,3 @@ router.use(function (req, res) {
 });
 
 
-function sendAnEmail(obj, id){
-  // console.log('IN FUNCTION: sendAnEmail', obj)
-    var mailOptions = {
-        from: "1604GHA",
-        to: obj.email,
-        subject: "Would love to get an update from you!",
-        text: `Hi ${obj.name} - would love to get an update from you!
-          http://${IPAddress}:1337/api/updateme/?from=${obj.email}&newsletterId=${id}
-        `    
-    };
-
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            return console.log(error);
-        }
-        console.log(chalk.magenta("Message Sent: ", info.response));
-    });
-
-}

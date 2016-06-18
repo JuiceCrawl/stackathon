@@ -20,6 +20,10 @@ var User = function (db) {
             type: Sequelize.BOOLEAN,
             defaultValue: false
         },
+        isSuperAdmin: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
         salt: {
             type: Sequelize.STRING
         },

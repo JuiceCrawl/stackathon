@@ -8,16 +8,16 @@ module.exports = function (db) {
             type: Sequelize.TEXT,
         },
         frequency: {
-            type: Sequelize.INTEGER, //freq by days to send newsletter
+            type: Sequelize.INTEGER, // in days
         },
         runDate: {
             type: Sequelize.DATE,
-            defaultValue: function(name){
-              
-              console.log('FREQ', name)
+            defaultValue: function() { //defaults to every 30 days
                 return new Date(new Date().getTime() + 60 * 60 * 24 * 30 * 1000);
             }
-        },
+        }
+    },{
+
     });
     
 };

@@ -41,6 +41,7 @@ var seedUsers = function () {
             email: 'annaegarcia@gmail.com',
             password: '123',
             isAdmin: true,
+            isSuperAdmin: true,
         },
         {
             name: 'Obama',
@@ -54,7 +55,10 @@ var seedUsers = function () {
         return User.create(userObj);
     });
 
-    return Promise.all(creatingUsers);
+    return Promise.all(creatingUsers)
+    // .then(function(user){
+    //     return user[0].addCohort()
+    // })
 
 };
 
