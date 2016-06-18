@@ -1,0 +1,29 @@
+<section id="home">
+  <div class="container">
+    <div class="row">
+      <div class="col-s-8">
+      <!-- cohort form -->
+        <form novalidate name="cohortForm" ng-submit="sendEmails(cohortName)">
+          <fieldset>
+            <label for="comment">Enter A Cohort Name</label>
+            <!-- <div ng-messages="cohortForm.cohort.$error" role="alert">
+              <div ng-message="required">Please enter an cohort name.</div>
+            </div> -->
+            <select class="form-control" ng-options="cohort.name for cohort in cohorts" ng-model="cohortName" name="cohort"></select>
+            <button type="submit" class="btn btn-success">Send Newsletter</button>  
+          </fieldset>
+        </form>
+        <!-- compilation form -->
+        <form novalidate name="cohortForm" ng-submit="sendCompilation(newsId)">
+          <fieldset>
+            <label for="comment">Select A Newsletter Id</label>
+            <select class="form-control" name="newsletterId" id="newsletterId" ng-options="news.id for news in newsletters" ng-model="newsId"></select>
+            <button type="submit" class="btn btn-primary">Send All Compiled Email</button>
+          </fieldset>
+        </form>
+      </div>
+    </div>  
+  </div>
+</section>
+
+

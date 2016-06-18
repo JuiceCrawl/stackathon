@@ -1,6 +1,7 @@
 'use strict';
 var path = require('path');
 var http = require('http');
+var chalk = require('chalk');
 var router = require('express').Router();
 var db = require('../../db');
 var Classmates = db.model('user');
@@ -9,7 +10,10 @@ var Newsletter = db.model('newsletter');
 var Cohort = db.model('cohort');
 var Bluebird = require('bluebird');
 var cron = require('node-cron');
-var IPAddress = '192.168.1.111';
+var IPAddress = '127.0.0.1';
+// var io = require('../../io');
+
+// console.log('IO', io);
 
 var task = cron.schedule('* * * * *', function() {
   console.log('will execute every minute until stopped');
@@ -44,7 +48,7 @@ var task = cron.schedule('* * * * *', function() {
         }).end();
       });
     }else{
-      console.log('no newsletters need processing!');
+      console.log(chalk.blue('No Newsletters need processing!'));
       return;
     }    
   });
@@ -88,6 +92,7 @@ router.post('/send',function(req, res, next){
     return Newsletter.create({  
         sendDate: Date.now(),
         cohortId : cohortId,
+        // cohortName : req.body.cohort,
         status: 'Pending'
     })
   })
@@ -240,7 +245,7 @@ router.get('/messages/:id', function(req, res, next){
           if (error) {
               return console.log(error);
           }
-          console.log("MESSAGE SENT: ", info.response);
+          console.log(chalk.magenta("MESSAGE SENT: ", info.response));
       });
     });
     res.sendStatus(201);
@@ -259,6 +264,24 @@ router.get('/cohort/:id', function(req,res, next){
     res.status(200).send(classList);
   })
 });
+
+router.get('/newsletters', function(req, res, next){
+  Newsletter.findAll()
+  .then(function(news){
+    var newsletters = news.map(n => n.dataValues);
+     //console.log('NEWS',newsletters)
+    res.status(200).send(newsletters);
+  });
+});
+
+router.get('/cohorts', function(req, res, next){
+  Cohort.findAll()
+  .then(function(cohort){
+    var cohorts = cohort.map(c => c.dataValues);
+     //console.log('NEWS',newsletters)
+    res.status(200).send(cohorts);
+  });
+})
 
 // Find all messages from a particular newsletter so that we can join them in 1 message
 
@@ -291,7 +314,7 @@ function sendAnEmail(obj, id){
         if (error) {
             return console.log(error);
         }
-        console.log("Message Sent: ", info.response);
+        console.log(chalk.magenta("Message Sent: ", info.response));
     });
 
 }
