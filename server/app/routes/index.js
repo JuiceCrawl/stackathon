@@ -88,6 +88,8 @@ router.post('/send',function(req, res, next){
 router.get('/updateme/', function(req, res, next){
   var indexFile = path.join(__dirname, '..', 'views', 'index.html');
 
+  req.session.newsId = req.query.newsletterId; //always update newsId
+  
   if(!req.session.userId){
       Classmates.findOne({
         where: {
@@ -95,8 +97,7 @@ router.get('/updateme/', function(req, res, next){
         }
       })
       .then(function(user){
-        req.session.userId = user.dataValues.id;
-        req.session.newsId = req.query.newsletterId; 
+        req.session.userId = user.dataValues.id; //asign by user's Id
       })
       .then(function(){
         console.log('SESSION',req.session) 
@@ -133,7 +134,6 @@ router.post('/store', function(req, res, next){
   })
   .then(function(whatHappened){
     //console.log('HAPPENED',whatHappened);
-    req.session.userId = '';
     res.sendStatus(201);
   })
   .catch(next);  
