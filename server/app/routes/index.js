@@ -281,16 +281,7 @@ router.get('/cohorts', function(req, res, next){
      //console.log('NEWS',newsletters)
     res.status(200).send(cohorts);
   });
-})
-
-// Find all messages from a particular newsletter so that we can join them in 1 message
-
-
-// Send joined message with some time frame, plus a button to automatically send
-// /send needs to start the timer and when timer goes off needs to call function to add all messages, 1. find all messsages from people in group(in the right timeline) 2. es6 template a message for each message 3. recall /send without a timer and with other template
-
-//how to handle finding messages based on user and based on time frame (dont want old messages), consider cohort or group too?
-
+});
 
 // Make sure this is after all of
 // the registered routes!

@@ -18,13 +18,20 @@ app.config(function ($stateProvider) {
 
 app.controller('AdminController', function ($scope, AdminFactory, newsletters, cohorts) {
 
-  $scope.sendEmails = function(name){
+  $scope.sendEmails = function(cohort){
     //name is the full cohort object
-    AdminFactory.sendEmails({cohort: name.name})
+    AdminFactory.sendEmails({cohort: cohort.name})
     .then(function(){
       $scope.name = '';
     })
   };
+
+  $scope.sendCompilation = function(newsletter){
+    AdminFactory.sendCompilation(newsletter.id)
+    .then(function(){
+      $scope.newsId = '';
+    })
+  }
 
   $scope.newsletters = newsletters;
   $scope.cohorts = cohorts;  
