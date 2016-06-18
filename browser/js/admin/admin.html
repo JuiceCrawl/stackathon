@@ -2,10 +2,12 @@
   <div class="container">
     <div class="row">
       <div class="col-s-8">
+      <section>
+      <h3>Override Bot</h3>
       <!-- cohort form -->
         <form novalidate name="cohortForm" ng-submit="sendEmails(cohortName)">
           <fieldset>
-            <label for="comment">Enter A Cohort Name</label>
+            <label for="cohort">Enter A Cohort Name</label>
             <!-- <div ng-messages="cohortForm.cohort.$error" role="alert">
               <div ng-message="required">Please enter an cohort name.</div>
             </div> -->
@@ -16,9 +18,35 @@
         <!-- compilation form -->
         <form novalidate name="cohortForm" ng-submit="sendCompilation(newsId)">
           <fieldset>
-            <label for="comment">Select A Newsletter Id</label>
+            <label for="newsletterId">Select A Newsletter Id</label>
             <select class="form-control" name="newsletterId" id="newsletterId" ng-options="news.id for news in newsletters" ng-model="newsId"></select>
-            <button type="submit" class="btn btn-primary">Send All Compiled Email</button>
+            <button type="submit" class="btn btn-primary">Send All Compiled Emails</button>
+          </fieldset>
+        </form>
+        </section>
+        <h3>Edit and Create</h3>
+        <!-- edit cohorts -->
+        <form novalidate name="editCohort" ng-submit="updateCohorts(selectedCohort)">
+          <fieldset>
+            <label for="cohorts">Edit A Cohort</label>
+            <select class="form-control" name="cohorts" id="cohorts" ng-options="cohort.name for cohort in cohorts" ng-model="selectedCohort"></select>
+            <label ng-if='selectedCohort' for="frequency">Enter A Frequency (in days) | currently : {{selectedCohort.frequency}}</label>
+            <input ng-if='selectedCohort' class="form-control" name="frequency" ng-model="selectedCohort.frequency"></input>
+            <label ng-if='selectedCohort' for="rundate">Change Next Run Date | currently : {{selectedCohort.runDate}}</label>
+            <input ng-if='selectedCohort' class="form-control" name="rundate" ng-model="selectedCohort.runDate"></input>
+            <button type="submit" class="btn btn-warning">Edit Cohorts</button>
+          </fieldset>
+        </form>
+         <!-- create cohorts -->
+         <form novalidate name="createCohort" ng-submit="createCohorts()">
+          <fieldset>
+            <label for="newcohorts">Create A Cohort</label>
+            <label class="form-control" name="newcohorts" id="newcohorts" ng-model="newCohort"></label>
+            <label for="frequency">Enter A Frequency (in days) | default is 30 days</label>
+            <input class="form-control" name="frequency"></input>
+            <label for="runtime">Enter A First Run Date | default is 30 days</label>
+            <input class="form-control" name="runtime"></input>
+            <button type="submit" class="btn btn-info">Create A Cohor</button>
           </fieldset>
         </form>
       </div>

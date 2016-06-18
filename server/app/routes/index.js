@@ -220,6 +220,15 @@ router.get('/messages/:id', function(req, res, next){
   });
 });
 
+router.get('/newsletters', function(req, res, next){
+  Newsletter.findAll()
+  .then(function(news){
+    var newsletters = news.map(n => n.dataValues);
+     //console.log('NEWS',newsletters)
+    res.status(200).send(newsletters);
+  });
+});
+
 router.get('/cohort/:id', function(req,res, next){
   Classmates.findAll({
     where: {
@@ -233,15 +242,6 @@ router.get('/cohort/:id', function(req,res, next){
   })
 });
 
-router.get('/newsletters', function(req, res, next){
-  Newsletter.findAll()
-  .then(function(news){
-    var newsletters = news.map(n => n.dataValues);
-     //console.log('NEWS',newsletters)
-    res.status(200).send(newsletters);
-  });
-});
-
 router.get('/cohorts', function(req, res, next){
   Cohort.findAll()
   .then(function(cohort){
@@ -249,6 +249,19 @@ router.get('/cohorts', function(req, res, next){
      //console.log('NEWS',newsletters)
     res.status(200).send(cohorts);
   });
+});
+
+router.post('/cohorts', function(req, res, next){
+  Cohort.findById(req.body.id)
+  .then(function(foundCohort){
+    return foundCohort.update({
+      frequency: req.body.frequency,
+      runDate: req.body.runDate
+    });
+  })
+  .then(function(cohort){
+    res.status(200).send(cohort);
+  })
 });
 
 // Make sure this is after all of

@@ -9,6 +9,7 @@ module.exports = function (db) {
         },
         frequency: {
             type: Sequelize.INTEGER, // in days
+            defaultValue: 30
         },
         runDate: {
             type: Sequelize.DATE,

@@ -23,6 +23,15 @@ app.factory('AdminFactory', function ($http) {
       .then(function(cohorts){
         return cohorts.data;
       });
+    },
+    updateCohorts : function(obj){
+      return $http.post('/api/cohorts', obj)
+      .then(function(updated){
+        return updated.data;
+      })
+      .then(null, function(err){
+        console.error(err);
+      });
     }
   };
 });
