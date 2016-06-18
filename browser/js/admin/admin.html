@@ -38,15 +38,15 @@
           </fieldset>
         </form>
          <!-- create cohorts -->
-         <form novalidate name="createCohort" ng-submit="createCohorts()">
+         <form novalidate name="createCohort" ng-submit="createCohorts(newCohort)">
           <fieldset>
-            <label for="newcohorts">Create A Cohort</label>
-            <label class="form-control" name="newcohorts" id="newcohorts" ng-model="newCohort"></label>
+            <label for="newcohorts">Create A Cohort Name</label>
+            <input class="form-control" name="newcohorts" id="newcohorts" ng-model="newCohort.name"></input>
             <label for="frequency">Enter A Frequency (in days) | default is 30 days</label>
-            <input class="form-control" name="frequency"></input>
-            <label for="runtime">Enter A First Run Date | default is 30 days</label>
-            <input class="form-control" name="runtime"></input>
-            <button type="submit" class="btn btn-info">Create A Cohor</button>
+            <input class="form-control" name="frequency" ng-model="newCohort.frequency"></input>
+            <label for="runtime">Enter A First Run Date | default is 30 days | YYYY-MM-DD</label>
+            <input class="form-control" name="runtime" ng-model="newCohort.runDate"></input>
+            <button type="submit" class="btn btn-info">Create A Cohort</button>
           </fieldset>
         </form>
       </div>

@@ -17,6 +17,10 @@ app.config(function ($stateProvider) {
 });
 
 app.controller('AdminController', function ($scope, AdminFactory, newsletters, cohorts) {
+  
+  $scope.newsletters = newsletters;
+
+  $scope.cohorts = cohorts;
 
   $scope.sendEmails = function(cohort){
     AdminFactory.sendEmails({cohort: cohort.name})
@@ -34,13 +38,12 @@ app.controller('AdminController', function ($scope, AdminFactory, newsletters, c
 
   $scope.updateCohorts = function(selectedCohort){
     AdminFactory.updateCohorts(selectedCohort)
-    .then(function(){
-      $scope.selectedCohort = {};
-    });
-    
+    .then(() => $scope.selectedCohort = {});
   };
 
-  $scope.newsletters = newsletters;
-  $scope.cohorts = cohorts;  
+  $scope.createCohorts = function(newCohort){
+    AdminFactory.createCohorts(newCohort)
+    .then(() => $scope.newCohort = {});
+  };  
 
 });

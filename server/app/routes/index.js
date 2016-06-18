@@ -251,7 +251,7 @@ router.get('/cohorts', function(req, res, next){
   });
 });
 
-router.post('/cohorts', function(req, res, next){
+router.put('/cohorts', function(req, res, next){
   Cohort.findById(req.body.id)
   .then(function(foundCohort){
     return foundCohort.update({
@@ -259,6 +259,13 @@ router.post('/cohorts', function(req, res, next){
       runDate: req.body.runDate
     });
   })
+  .then(function(cohort){
+    res.status(200).send(cohort);
+  })
+});
+
+router.post('/cohorts', function(req, res, next){
+  Cohort.create(req.body)
   .then(function(cohort){
     res.status(200).send(cohort);
   })
