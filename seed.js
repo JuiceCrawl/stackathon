@@ -25,8 +25,8 @@ var Promise = require('sequelize').Promise;
 
 var seedCohort = function(){
     var cohort = [
-        {name: '1604GHA'}, 
-        {name: '1604FA'}];
+        {name: '1604GHA', frequency: 30}, 
+        {name: '1604FA', frequency: 7}];
 
     var creatingCohorts = cohort.map(cohort => Cohort.create(cohort));
 
