@@ -14,9 +14,9 @@ var Bluebird = require('bluebird');
 var cron = require('node-cron');
 var IPAddress = '127.0.0.1';
 var utils = require('../utils/utils');
-// var io = require('../../io');
+var io = require('../../io')();
 
-// console.log('IO', io);
+//console.log('IO', io);
 
 var task = cron.schedule('* * * * *', function() {
   //console.log('will execute every minute until stopped');
@@ -39,7 +39,6 @@ var transporter = nodemailer.createTransport(smtpTransport({
 
 //find all cohort mates from DB and her emails
 router.post('/send',function(req, res, next){
-
   //find cohort, create newsletter, set cohort, find classmate
   var newsletterId;
   var cohortId;
@@ -50,13 +49,13 @@ router.post('/send',function(req, res, next){
       }
   })
   .then(function(cohort){
-    // console.log(' 1 FOUND COHORT', cohort)
+    //console.log(' 1 FOUND COHORT', cohort)
     cohort = cohort;
     cohortId = cohort.dataValues.id;
     return cohort;
   })
   .then(function(cohort){
-    // console.log('2 FOUND COHORT', cohort)
+    //console.log('2 FOUND COHORT', cohort)
     return Newsletter.create({  
         sendDate: Date.now(),
         cohortId : cohortId,
@@ -76,39 +75,12 @@ router.post('/send',function(req, res, next){
     //console.log('LOGGING', cohortMates.map(e => e.dataValues) )
     var peopleObj = cohortMates.map(e => e.dataValues)
     //console.log('NEWS',newsletterId)
-    peopleObj.forEach(person => utils.sendAnEmail(person, newsletterId));
+    peopleObj.forEach(person => utils.sendAnEmail(person, newsletterId, cohortId));
 
     res.sendStatus(201);
   })
   .catch(next);
 
-});
-
-// Direct classmate to template, she is directed here after clicking her email link
-router.get('/updateme/', function(req, res, next){
-  var indexFile = path.join(__dirname, '..', 'views', 'index.html');
-
-  req.session.newsId = req.query.newsletterId; //always update newsId
-  
-  if(!req.session.userId){
-      Classmates.findOne({
-        where: {
-          email: req.query.from
-        }
-      })
-      .then(function(user){
-        req.session.userId = user.dataValues.id; //asign by user's Id
-      })
-      .then(function(){
-        console.log('SESSION',req.session) 
-        res.sendFile(indexFile);
-      })     
-  }else{
-    console.log('SESSION',req.session) 
-    res.sendFile(indexFile);
-  }
-  //console.log('SESSION',req.session) 
- 
 });
 
 // Store message with appropriate person in DB
@@ -229,19 +201,6 @@ router.get('/newsletters', function(req, res, next){
   });
 });
 
-router.get('/cohort/:id', function(req,res, next){
-  Classmates.findAll({
-    where: {
-      cohortId : req.params.id
-    }
-  })
-  .then(function(classmates){
-    var classList = classmates.map(e => e.dataValues);
-    //console.log(classList)
-    res.status(200).send(classList);
-  })
-});
-
 router.get('/cohorts', function(req, res, next){
   Cohort.findAll()
   .then(function(cohort){
@@ -268,6 +227,27 @@ router.post('/cohorts', function(req, res, next){
   Cohort.create(req.body)
   .then(function(cohort){
     res.status(200).send(cohort);
+  })
+});
+
+router.get('/cohort/:id', function(req, res, next){
+  console.log('inside')
+  Cohort.findById(req.params.id)
+  .then(function(cohort){
+    res.status(200).send(cohort.dataValues);
+  });
+});
+
+router.get('/cohort/:id/classmates', function(req,res, next){
+  Classmates.findAll({
+    where: {
+      cohortId : req.params.id
+    }
+  })
+  .then(function(classmates){
+    var classList = classmates.map(e => e.dataValues);
+    //console.log(classList)
+    res.status(200).send(classList);
   })
 });
 

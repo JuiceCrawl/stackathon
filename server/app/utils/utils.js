@@ -27,14 +27,14 @@ var transporter = nodemailer.createTransport(smtpTransport({
     }
 }));
 
-function sendAnEmail(obj, id){
+function sendAnEmail(obj, newsId, cohortId){
   // console.log('IN FUNCTION: sendAnEmail', obj)
     var mailOptions = {
         from: "1604GHA",
         to: obj.email,
         subject: "Would love to get an update from you!",
         text: `Hi ${obj.name} - would love to get an update from you!
-          http://${IPAddress}:1337/api/updateme/?from=${obj.email}&newsletterId=${id}
+          http://${IPAddress}:1337/cohort/${cohortId}?from=${obj.email}&newsletterId=${newsId}
         `    
     };
 
@@ -136,9 +136,9 @@ function findOverdueCohorts(){
             req.on('error', (e) => {
               console.log(`problem with request: ${e.message}`);
             });
-
             // write data to request body
             req.write(postData);
+            console.log('send to end')
             req.end();
       });
     }else{
