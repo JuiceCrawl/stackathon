@@ -21,10 +21,19 @@ $urlRouterProvider.when('/:newsId/cohort/:id', '/:newsId/cohort/:id/updateme');
         controller: 'SubmittedController',
         resolve: {
           classList: function($stateParams, CohortFactory){ 
-              return CohortFactory.getAllResponders($stateParams.newsId);    
+              return CohortFactory.getAllResponders($stateParams.newsId)
+              .then(function(responded){
+                var namesOnly = responded.map(r => r.name)
+                //return only uniq names
+                var uniq = namesOnly.reduce(function(a,b){
+                  if (a.indexOf(b) < 0 ) a.push(b);
+                  return a;
+                },[]);
+                return uniq;
+              });    
           }
         }
-    })
+    });
 
 });
 
@@ -33,9 +42,17 @@ app.controller('CohortCtrl', function($scope){
 
 });
 
-app.controller('SubmittedController', function($scope, classList){
+app.controller('SubmittedController', function($scope, classList, $stateParams){
     $scope.classList = classList;
-    console.log($scope.classList);
+    // var num = $stateParams.newsId;
+
+    // socket.on('responded', function(num){
+    //   CohortFactory.getAllResponders(num)
+    //   .then(function(c){
+    //     console.log('CCCCCC',c)
+    //     $scope.classList = c;
+    //   })
+    // })
 });
 
 
