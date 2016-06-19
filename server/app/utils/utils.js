@@ -34,7 +34,7 @@ function sendAnEmail(obj, newsId, cohortId){
         to: obj.email,
         subject: "Would love to get an update from you!",
         text: `Hi ${obj.name} - would love to get an update from you!
-          http://${IPAddress}:1337/cohort/${cohortId}?from=${obj.email}&newsletterId=${newsId}
+          http://${IPAddress}:1337/${newsId}/cohort/${cohortId}?from=${obj.email}&newsletterId=${newsId}
         `    
     };
 

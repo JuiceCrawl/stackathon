@@ -201,6 +201,29 @@ router.get('/newsletters', function(req, res, next){
   });
 });
 
+//find people who have responded to a particular newsletter
+router.get('/newsletters/:id/authors', function(req, res, next){
+  Messages.findAll({
+    where:{
+      newsletterId : req.params.id
+    }
+  })
+  .then(function(news){
+    var messages = news.map(n => n.dataValues);
+    //console.log('MESSAGES', messages)
+    return Bluebird.map(messages, function(m){
+      return Classmates.findById(m.userId)
+      .then(function(author){
+        return author
+      })
+    });
+  })
+  .then(function(authorPromises){
+    var authors = authorPromises.map(a => a.dataValues)
+    res.status(200).send(authors);
+  })
+});
+
 router.get('/cohorts', function(req, res, next){
   Cohort.findAll()
   .then(function(cohort){

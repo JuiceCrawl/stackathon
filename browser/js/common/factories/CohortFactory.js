@@ -17,6 +17,15 @@ app.factory('CohortFactory', function ($http) {
       .then(null, function(err){
         console.error(err);
       });
+    },
+    getAllResponders: function(newsId){
+      return $http.get(`/api/newsletters/${newsId}/authors`)
+      .then(function(classmates){
+        return classmates.data;
+      })
+      .then(null, function(err){
+        console.error(err);
+      });
     }
   };
 });

@@ -1,14 +1,9 @@
 app.config(function ($stateProvider, $urlRouterProvider) {
-$urlRouterProvider.when('/cohort/:id', '/cohort/:id/updateme');
+$urlRouterProvider.when('/:newsId/cohort/:id', '/:newsId/cohort/:id/updateme');
     $stateProvider.state('cohort', {
-        url: '/cohort/:id',
+        url: '/:newsId/cohort/:id',
         controller: 'CohortCtrl',
-        templateUrl: 'js/cohorts/cohorts.html',
-        resolve: {
-          classList: function($stateParams, CohortFactory){ 
-              return CohortFactory.getAllUsers($stateParams.id);    
-          }
-        }
+        templateUrl: 'js/cohorts/cohorts.html', 
     })
     .state('cohort.updateme', {
         url: '/updateme',
@@ -23,11 +18,26 @@ $urlRouterProvider.when('/cohort/:id', '/cohort/:id/updateme');
     .state('cohort.submitted', {
         url: '/submitted',
         templateUrl: 'js/cohorts/submitted.html',
+        controller: 'SubmittedController',
+        resolve: {
+          classList: function($stateParams, CohortFactory){ 
+              return CohortFactory.getAllResponders($stateParams.newsId);    
+          }
+        }
     })
 
 });
 
-app.controller('CohortCtrl', function($scope, classList){
-    // $scope.cohort = cohort;
-    $scope.classList = classList;
+app.controller('CohortCtrl', function($scope){
+
+
 });
+
+app.controller('SubmittedController', function($scope, classList){
+    $scope.classList = classList;
+    console.log($scope.classList);
+});
+
+
+
+
